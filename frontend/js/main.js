@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const animateBtn = document.getElementById('animateBtn');
     const resetBtn = document.getElementById('resetBtn');
     const routeInfo = document.getElementById('routeInfo');
+    const algorithmSelect = document.getElementById('algorithmSelect');
     
     // API base URL
     const API_URL = window.location.hostname === 'localhost' 
@@ -42,29 +43,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // Solve the current route
     async function solveRoute() {
         try {
-            const problem = routeMap.problem;
-            if (!problem) return;
+            const algorithm = algorithmSelect.value;
+            let solution;
             
-            const response = await fetch(`${API_URL}/solve`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(problem)
-            });
-            
-            const solution = await response.json();
-            
-            if (solution.error) {
-                showError(solution.error);
-                return;
+            if (algorithm === 'vrp') {
+                // Use OR-Tools backend solver
+                const problem = routeMap.problem;
+                if (!problem) return;
+                
+                const response = await fetch(`${API_URL}/solve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(problem)
+                });
+                
+                solution = await response.json();
+                
+                if (solution.error) {
+                    showError(solution.error);
+                    return;
+                }
+            } else if (algorithm === 'dijkstra') {
+                // Use frontend Dijkstra solver
+                solution = routeMap.solveDijkstra();
+                if (!solution) {
+                    showError('Failed to solve using Dijkstra.');
+                    return;
+                }
+            } else if (algorithm === 'tsp') {
+                // Use frontend TSP solver
+                solution = routeMap.solveTSP();
+                if (!solution) {
+                    showError('Failed to solve using TSP.');
+                    return;
+                }
             }
             
             // Display the solution on the map
             routeMap.setSolution(solution);
             
             // Update UI
-            updateSolutionInfo(solution);
+            updateSolutionInfo(solution, algorithm);
             animateBtn.disabled = false;
         } catch (error) {
             console.error('Error solving route:', error);
@@ -88,21 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Helper functions
     function updateProblemInfo(problem) {
         let html = '<h3>Problem Setup</h3>';
-        html += `<p>Driver starts at: [${problem.driver.join(', ')}]</p>`;
+        html += `<p>Driver starts at: [${problem.driver[1].toFixed(4)}, ${problem.driver[0].toFixed(4)}]</p>`;
         html += '<h4>Passengers:</h4><ul>';
         
         problem.passengers.forEach((passenger, index) => {
             html += `<li><strong>Passenger ${index+1}:</strong><br>`;
-            html += `Pickup: [${passenger.pickup.join(', ')}]<br>`;
-            html += `Dropoff: [${passenger.dropoff.join(', ')}]</li>`;
+            html += `Pickup: [${passenger.pickup[1].toFixed(4)}, ${passenger.pickup[0].toFixed(4)}]<br>`;
+            html += `Dropoff: [${passenger.dropoff[1].toFixed(4)}, ${passenger.dropoff[0].toFixed(4)}]</li>`;
         });
         
-        html += '</ul><p>Click "Find Optimal Route" to solve.</p>';
+        html += '</ul><p>Select algorithm and click "Find Optimal Route" to solve.</p>';
         routeInfo.innerHTML = html;
     }
     
-    function updateSolutionInfo(solution) {
-        let html = '<h3>Optimal Route</h3>';
+    function updateSolutionInfo(solution, algorithm) {
+        let html = `<h3>Optimal Route (${getAlgorithmName(algorithm)})</h3>`;
         html += '<ol>';
         
         solution.route.forEach((point, index) => {
@@ -113,12 +134,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 typeText = point.type === 'pickup' ? 'Pickup' : 'Dropoff';
             }
             
-            html += `<li>${typeText} at [${point.location.join(', ')}]</li>`;
+            html += `<li>${typeText} at [${point.location[1].toFixed(4)}, ${point.location[0].toFixed(4)}]</li>`;
         });
         
         html += '</ol>';
         html += '<p>Click "Animate Route" to see the journey.</p>';
         routeInfo.innerHTML = html;
+    }
+    
+    function getAlgorithmName(algorithm) {
+        switch(algorithm) {
+            case 'vrp': return 'OR-Tools VRP';
+            case 'dijkstra': return 'Dijkstra\'s Algorithm';
+            case 'tsp': return 'TSP';
+            default: return algorithm;
+        }
     }
     
     function showError(message) {

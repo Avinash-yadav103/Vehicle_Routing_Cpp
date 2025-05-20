@@ -170,4 +170,142 @@ class RouteMap {
         marker.bindPopup(content).openPopup();
         setTimeout(() => marker.closePopup(), 900);
     }
+    
+    solveDijkstra() {
+        if (!this.problem) return null;
+        
+        // Create locations array with driver, pickups, and dropoffs
+        const locations = [this.problem.driver];
+        this.problem.passengers.forEach(passenger => {
+            locations.push(passenger.pickup);
+            locations.push(passenger.dropoff);
+        });
+        
+        // Create distance matrix
+        const distanceMatrix = RoutingAlgorithms.createDistanceMatrix(locations);
+        
+        // Create a graph path that visits all locations
+        // Starting from driver (index 0)
+        let currentNode = 0;
+        const path = [currentNode];
+        const visited = new Array(locations.length).fill(false);
+        visited[currentNode] = true;
+        
+        // Visit all nodes using Dijkstra
+        while (path.length < locations.length) {
+            let bestNextNode = -1;
+            let shortestPath = null;
+            
+            for (let i = 0; i < locations.length; i++) {
+                if (visited[i]) continue;
+                
+                // Find shortest path from current to this node
+                const result = RoutingAlgorithms.dijkstra(distanceMatrix, currentNode, i);
+                
+                if (bestNextNode === -1 || result.distance < shortestPath.distance) {
+                    bestNextNode = i;
+                    shortestPath = result;
+                }
+            }
+            
+            // Add all intermediate nodes in the path
+            for (let i = 1; i < shortestPath.path.length; i++) {
+                const node = shortestPath.path[i];
+                if (!visited[node]) {
+                    path.push(node);
+                    visited[node] = true;
+                }
+            }
+            
+            currentNode = bestNextNode;
+        }
+        
+        // Convert path to route
+        const route = path.map(nodeIndex => {
+            let type = "unknown";
+            if (nodeIndex === 0) {
+                type = "driver";
+            } else {
+                // Check if it's a pickup or dropoff
+                for (let i = 0; i < this.problem.passengers.length; i++) {
+                    if (JSON.stringify(locations[nodeIndex]) === JSON.stringify(this.problem.passengers[i].pickup)) {
+                        type = "pickup";
+                        break;
+                    } else if (JSON.stringify(locations[nodeIndex]) === JSON.stringify(this.problem.passengers[i].dropoff)) {
+                        type = "dropoff";
+                        break;
+                    }
+                }
+            }
+            
+            return {
+                index: nodeIndex,
+                location: locations[nodeIndex],
+                type: type
+            };
+        });
+        
+        return {
+            route: route,
+            locations: locations.map((loc, i) => ({
+                index: i,
+                location: loc,
+                type: i === 0 ? "driver" : (i % 2 === 1 ? "pickup" : "dropoff")
+            }))
+        };
+    }
+    
+    solveTSP() {
+        if (!this.problem) return null;
+        
+        // Create locations array with driver, pickups, and dropoffs
+        const locations = [this.problem.driver];
+        const pickupDeliveryPairs = [];
+        let index = 1;
+        
+        this.problem.passengers.forEach(passenger => {
+            const pickupIndex = index++;
+            const dropoffIndex = index++;
+            locations.push(passenger.pickup);
+            locations.push(passenger.dropoff);
+            pickupDeliveryPairs.push([pickupIndex, dropoffIndex]);
+        });
+        
+        // Create distance matrix
+        const distanceMatrix = RoutingAlgorithms.createDistanceMatrix(locations);
+        
+        // Solve TSP with pickup-delivery constraints
+        const tour = RoutingAlgorithms.pickupDeliveryTSP(distanceMatrix, pickupDeliveryPairs, 0);
+        
+        // Convert tour to route
+        const route = tour.map(nodeIndex => ({
+            index: nodeIndex,
+            location: locations[nodeIndex],
+            type: this._getLocationTypeByIndex(nodeIndex, locations)
+        }));
+        
+        return {
+            route: route,
+            locations: locations.map((loc, i) => ({
+                index: i,
+                location: loc,
+                type: this._getLocationTypeByIndex(i, locations)
+            }))
+        };
+    }
+    
+    _getLocationTypeByIndex(index, locations) {
+        if (index === 0) return "driver";
+        
+        for (let i = 0; i < this.problem.passengers.length; i++) {
+            if (JSON.stringify(locations[index]) === JSON.stringify(this.problem.passengers[i].pickup)) {
+                return "pickup";
+            }
+            if (JSON.stringify(locations[index]) === JSON.stringify(this.problem.passengers[i].dropoff)) {
+                return "dropoff";
+            }
+        }
+        
+        return "unknown";
+    }
 }

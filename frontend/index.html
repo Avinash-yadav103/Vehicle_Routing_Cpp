@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ride-Sharing Route Optimizer</title>
+    <title>Route Optimizer</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -14,6 +13,13 @@
             <h1>Ride-Sharing Route Optimizer</h1>
             <div class="controls">
                 <button id="generateBtn">Generate Random Problem</button>
+                <div class="algorithm-selector">
+                    <select id="algorithmSelect">
+                        <option value="vrp">OR-Tools (VRP)</option>
+                        <option value="dijkstra">Dijkstra</option>
+                        <option value="tsp">TSP</option>
+                    </select>
+                </div>
                 <button id="solveBtn" disabled>Find Optimal Route</button>
                 <button id="animateBtn" disabled>Animate Route</button>
                 <button id="resetBtn">Reset</button>
@@ -36,6 +42,12 @@
                         <li><span class="route-line"></span> Optimal Route</li>
                     </ul>
                 </div>
+                <div class="algorithm-info">
+                    <h3>Algorithm Information</h3>
+                    <p><strong>OR-Tools (VRP):</strong> Google's optimization engine that finds the most optimal route respecting all constraints.</p>
+                    <p><strong>Dijkstra:</strong> Finds shortest paths between nodes in a graph, visiting all locations.</p>
+                    <p><strong>TSP:</strong> Solves the Traveling Salesman Problem with pickup/delivery constraints.</p>
+                </div>
             </div>
         </main>
         
@@ -45,6 +57,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="js/algorithms.js"></script>
     <script src="js/map.js"></script>
     <script src="js/main.js"></script>
 </body>
