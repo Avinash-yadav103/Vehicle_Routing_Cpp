@@ -1,0 +1,153 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+main {
+    display: flex;
+    flex: 1;
+    gap: 20px;
+}
+
+#map {
+    flex: 3;
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.info-panel {
+    flex: 1;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+h2 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+#routeInfo {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.legend {
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.legend h3 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.legend ul {
+    list-style: none;
+}
+
+.legend li {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.marker {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.driver {
+    background-color: #e74c3c;
+}
+
+.pickup {
+    background-color: #2ecc71;
+}
+
+.dropoff {
+    background-color: #f39c12;
+}
+
+.route-line {
+    display: inline-block;
+    height: 3px;
+    width: 30px;
+    background-color: #3498db;
+    margin-right: 8px;
+}
+
+footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+    }
+    
+    #map {
+        height: 60vh;
+    }
+}

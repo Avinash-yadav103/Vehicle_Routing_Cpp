@@ -1,0 +1,383 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 25px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.2rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+h2, h3 {
+    color: #2980b9;
+    margin-top: 25px;
+}
+
+p {
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+/* Introduction Section */
+.intro-section {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border-left: 4px solid #3498db;
+}
+
+.algorithm-info {
+    margin-top: 15px;
+}
+
+.algorithm-info ol {
+    padding-left: 25px;
+}
+
+.algorithm-info li {
+    margin-bottom: 8px;
+}
+
+/* Graph Visualization */
+.graph-visualization {
+    margin: 30px 0;
+    padding: 15px;
+    background-color: #eef5f9;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.graph-container {
+    cursor: grab;
+}
+
+.graph-container:active {
+    cursor: grabbing;
+}
+
+.graph-container {
+    position: relative;
+    height: 500px; /* Increased height */
+    max-width: 800px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.node {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    z-index: 2;
+}
+
+.node:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+.edge, .edge-diagonal {
+    position: absolute;
+    height: 4px;
+    background-color: #95a5a6;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.weight {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.graph-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.graph-legend p {
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.circle {
+    color: #3498db;
+    font-size: 20px;
+    margin-right: 5px;
+}
+
+.line {
+    background-color: #95a5a6;
+    width: 20px;
+    height: 3px;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+/* Form Styling */
+.form-description {
+    margin-bottom: 15px;
+    background-color: #f0f7fc;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 3px solid #3498db;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+label {
+    font-weight: bold;
+    text-align: left;
+    color: #2c3e50;
+}
+
+input {
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+button {
+    padding: 14px;
+    font-size: 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Results Section */
+#output {
+    margin-top: 30px;
+    font-size: 16px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #2ecc71;
+}
+
+#output.hidden {
+    display: none;
+}
+
+.result-summary {
+    background-color: #eef5f9;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.path-details {
+    margin-top: 25px;
+}
+
+.path-step {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.path-step:last-child {
+    border-bottom: none;
+}
+
+.algorithm-explanation {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #eef5f9;
+    border-radius: 6px;
+    border-left: 3px solid #f39c12;
+}
+
+/* Node and Edge highlighting */
+.node-in-path {
+    background-color: #e74c3c;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+.edge-in-path {
+    background-color: #e74c3c;
+    height: 6px;
+}
+
+/* Status Messages */
+.error {
+    color: #e74c3c;
+    font-weight: bold;
+    background-color: #fdecea;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border-left: 4px solid #e74c3c;
+}
+
+.warning {
+    color: #f39c12;
+    font-weight: bold;
+    background-color: #fef5e7;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border-left: 4px solid #f39c12;
+}
+
+/* Add these styles to your CSS file */
+.graph-controls {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.graph-controls button {
+    padding: 6px 12px;
+    margin: 0 5px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.graph-controls button:hover {
+    background-color: #e9ecef;
+}
+
+/* User summaries in TSP results */
+.user-summaries {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.user-summary {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.user-summary h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.address-line {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.path-segment {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.segment-nodes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.node-info {
+    text-align: center;
+}
+
+.node-id {
+    font-weight: bold;
+    color: #3498db;
+}
+
+.node-name {
+    font-size: 14px;
+    color: #555;
+}
+
+.segment-distance {
+    align-self: flex-end;
+    font-size: 14px;
+    color: #7f8c8d;
+}

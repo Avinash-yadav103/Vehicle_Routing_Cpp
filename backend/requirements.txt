@@ -1,0 +1,4 @@
+flask==2.0.1
+flask-cors==3.0.10
+ortools==9.4.1874
+numpy==1.21.0

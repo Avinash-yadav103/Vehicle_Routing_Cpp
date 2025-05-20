@@ -1,0 +1,160 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "user": "Alice Smith",
+      "pickup": "123 Main St, Downtown",
+      "destination": "456 Park Ave, Uptown"
+    },
+    {
+      "id": 2,
+      "user": "Bob Johnson",
+      "pickup": "789 Oak Dr, Westside",
+      "destination": "321 Pine Rd, Eastside"
+    },
+    {
+      "id": 3,
+      "user": "Carol Williams",
+      "pickup": "555 Maple Ave, Northside",
+      "destination": "777 Elm St, Southside"
+    },
+    {
+      "id": 4,
+      "user": "David Brown",
+      "pickup": "888 Cedar Ln, Lakefront",
+      "destination": "999 Birch Blvd, Mountainview"
+    },
+    {
+      "id": 5,
+      "user": "Emma Davis",
+      "pickup": "101 River Rd, Brookside",
+      "destination": "202 Valley Way, Hillcrest"
+    },
+    {
+      "id": 6,
+      "user": "Frank Wilson",
+      "pickup": "303 Beach Blvd, Seaside",
+      "destination": "404 Forest Path, Woodland"
+    },
+    {
+      "id": 7,
+      "user": "Grace Taylor",
+      "pickup": "505 Sunset Dr, Westend",
+      "destination": "606 Sunrise Ave, Eastend"
+    },
+    {
+      "id": 8,
+      "user": "Henry Martin",
+      "pickup": "707 Mountain Rd, Heights",
+      "destination": "808 Lake View, Waterfront"
+    },
+    {
+      "id": 9,
+      "user": "Isabel Garcia",
+      "pickup": "909 Bridge St, Riverside",
+      "destination": "111 Park Lane, Greenfield"
+    },
+    {
+      "id": 10,
+      "user": "Jack Lee",
+      "pickup": "222 Tower Ave, Downtown",
+      "destination": "333 Central Pl, Midtown"
+    },
+    {
+      "id": 11,
+      "user": "Karen Chen",
+      "pickup": "444 Market St, Financial District",
+      "destination": "555 College Rd, University"
+    },
+    {
+      "id": 12,
+      "user": "Leo Rodriguez",
+      "pickup": "666 Harbor Dr, Bayfront",
+      "destination": "777 Summit Way, Hilltop"
+    },
+    {
+      "id": 13,
+      "user": "Mia Nguyen",
+      "pickup": "888 Garden St, Parkside",
+      "destination": "999 School Ln, Campus"
+    },
+    {
+      "id": 14,
+      "user": "Noah Kim",
+      "pickup": "123 Station Rd, Transit Center",
+      "destination": "234 Airport Blvd, Terminal"
+    },
+    {
+      "id": 15,
+      "user": "Olivia Patel",
+      "pickup": "345 Hospital Way, Medical Center",
+      "destination": "456 Shopping Ave, Mall"
+    },
+    {
+      "id": 16,
+      "user": "Peter Singh",
+      "pickup": "567 Library Ln, Bookends",
+      "destination": "678 Theater St, Arts District"
+    },
+    {
+      "id": 17,
+      "user": "Quinn Jones",
+      "pickup": "789 Sports Complex, Stadium",
+      "destination": "890 Recreation Rd, Park"
+    },
+    {
+      "id": 18,
+      "user": "Rachel Moore",
+      "pickup": "901 Factory Ave, Industrial",
+      "destination": "112 Office Park, Business Center"
+    },
+    {
+      "id": 19,
+      "user": "Sam Thompson",
+      "pickup": "223 Restaurant Row, Dining District",
+      "destination": "334 Hotel Circle, Lodging"
+    },
+    {
+      "id": 20,
+      "user": "Tina White",
+      "pickup": "445 Historic Way, Old Town",
+      "destination": "556 Modern Blvd, New Development"
+    }
+  ],
+  "edges": [
+    {"source": 1, "target": 2, "weight": 4},
+    {"source": 1, "target": 3, "weight": 2},
+    {"source": 1, "target": 5, "weight": 7},
+    {"source": 2, "target": 3, "weight": 1},
+    {"source": 2, "target": 4, "weight": 5},
+    {"source": 2, "target": 8, "weight": 6},
+    {"source": 3, "target": 4, "weight": 8},
+    {"source": 3, "target": 9, "weight": 5},
+    {"source": 4, "target": 12, "weight": 7},
+    {"source": 5, "target": 6, "weight": 3},
+    {"source": 5, "target": 8, "weight": 9},
+    {"source": 5, "target": 13, "weight": 6},
+    {"source": 6, "target": 7, "weight": 2},
+    {"source": 6, "target": 14, "weight": 7},
+    {"source": 7, "target": 8, "weight": 4},
+    {"source": 7, "target": 17, "weight": 5},
+    {"source": 8, "target": 16, "weight": 6},
+    {"source": 9, "target": 10, "weight": 4},
+    {"source": 9, "target": 12, "weight": 8},
+    {"source": 9, "target": 16, "weight": 5},
+    {"source": 10, "target": 11, "weight": 3},
+    {"source": 10, "target": 18, "weight": 5},
+    {"source": 11, "target": 12, "weight": 2},
+    {"source": 11, "target": 20, "weight": 6},
+    {"source": 12, "target": 20, "weight": 4},
+    {"source": 13, "target": 14, "weight": 3},
+    {"source": 13, "target": 16, "weight": 7},
+    {"source": 14, "target": 15, "weight": 4},
+    {"source": 15, "target": 16, "weight": 2},
+    {"source": 15, "target": 19, "weight": 3},
+    {"source": 17, "target": 18, "weight": 3},
+    {"source": 17, "target": 20, "weight": 8},
+    {"source": 18, "target": 19, "weight": 4},
+    {"source": 19, "target": 20, "weight": 2}
+  ]
+}

@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride-Sharing Route Optimizer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Ride-Sharing Route Optimizer</h1>
+            <div class="controls">
+                <button id="generateBtn">Generate Random Problem</button>
+                <button id="solveBtn" disabled>Find Optimal Route</button>
+                <button id="animateBtn" disabled>Animate Route</button>
+                <button id="resetBtn">Reset</button>
+            </div>
+        </header>
+        
+        <main>
+            <div id="map"></div>
+            <div class="info-panel">
+                <h2>Route Information</h2>
+                <div id="routeInfo">
+                    <p>Generate a random problem or place markers manually.</p>
+                </div>
+                <div class="legend">
+                    <h3>Legend</h3>
+                    <ul>
+                        <li><span class="marker driver"></span> Driver</li>
+                        <li><span class="marker pickup"></span> Pickup Location</li>
+                        <li><span class="marker dropoff"></span> Dropoff Location</li>
+                        <li><span class="route-line"></span> Optimal Route</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Vehicle Routing Problem Visualization | Made with OR-Tools</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
