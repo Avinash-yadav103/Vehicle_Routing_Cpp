@@ -2,7 +2,15 @@ class RouteMap {
     constructor(elementId) {
         // Initialize map centered on Delhi, India
         const delhiCoords = [28.7041, 77.1025];
-        this.map = L.map(elementId).setView(delhiCoords, 11);  // Zoom level 11 for city view
+        
+        // Initialize with fullscreen options
+        this.map = L.map(elementId, {
+            center: delhiCoords,
+            zoom: 11,
+            zoomControl: false, // We'll add our own zoom controls
+            attributionControl: false // We'll add attribution in a better position
+        });
+        
         this.markers = [];
         this.routeLine = null;
         this.animationMarker = null;
@@ -11,13 +19,13 @@ class RouteMap {
         
         // Set up the map with a custom style
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.map);
         
-        // No need for artificial bounds as we'll be using real-world coordinates
-        // Remove these two lines:
-        // this.map.setMaxBounds([[0, 0], [100, 100]]);
-        // this.map.fitBounds([[0, 0], [100, 100]]);
+        // Add attribution to bottom-right
+        L.control.attribution({
+            position: 'bottomright'
+        }).addTo(this.map);
         
         // Custom icons
         this.icons = {
@@ -25,14 +33,34 @@ class RouteMap {
             pickup: this._createIcon('#2ecc71'),
             dropoff: this._createIcon('#f39c12')
         };
+        
+        // Add click event to the map
+        this.map.on('click', (e) => {
+            console.log(`Clicked at: [${e.latlng.lng.toFixed(6)}, ${e.latlng.lat.toFixed(6)}]`);
+        });
     }
     
-    _createIcon(color) {
+    _createIcon(color, size = 30) {
         return L.divIcon({
-            className: 'custom-marker',
-            html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
+            className: 'custom-div-icon',
+            html: `
+                <div style="
+                    background-color: ${color}; 
+                    width: ${size}px; 
+                    height: ${size}px; 
+                    border-radius: 50%; 
+                    border: 3px solid white; 
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-weight: bold;
+                    font-size: ${size/2}px;
+                "></div>
+            `,
+            iconSize: [size, size],
+            iconAnchor: [size/2, size/2]
         });
     }
     

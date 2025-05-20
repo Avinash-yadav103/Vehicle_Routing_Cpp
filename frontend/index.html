@@ -3,16 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Route Optimizer</title>
+    <title>Route Optimizer | Algorithmic Ride-Sharing</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Ride-Sharing Route Optimizer</h1>
+        <!-- Full-screen map -->
+        <div id="map"></div>
+        
+        <!-- Top navigation bar -->
+        <div class="top-bar">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="#4a6dff">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <h1>Algorithmic Route Optimizer</h1>
+            </div>
+            
             <div class="controls">
-                <button id="generateBtn">Generate Random Problem</button>
+                <button id="generateBtn">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Generate Problem
+                </button>
+                
                 <div class="algorithm-selector">
                     <select id="algorithmSelect">
                         <option value="vrp">OR-Tools (VRP)</option>
@@ -20,45 +37,218 @@
                         <option value="tsp">TSP</option>
                     </select>
                 </div>
-                <button id="solveBtn" disabled>Find Optimal Route</button>
-                <button id="animateBtn" disabled>Animate Route</button>
-                <button id="resetBtn">Reset</button>
+                
+                <button id="solveBtn" disabled>
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Solve Route
+                </button>
+                
+                <button id="animateBtn" disabled>
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                    </svg>
+                    Animate
+                </button>
+                
+                <button id="resetBtn">
+                    <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                    </svg>
+                    Reset
+                </button>
             </div>
-        </header>
+        </div>
         
-        <main>
-            <div id="map"></div>
-            <div class="info-panel">
+        <!-- Map tools panel -->
+        <div class="map-tools">
+            <div class="map-tool" title="Zoom In">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="map-tool" title="Zoom Out">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="map-tool" title="Center Map">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zm0-6a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm0-3a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Sidebar for information -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-toggle" id="sidebar-toggle">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            
+            <div class="scroll-content">
                 <h2>Route Information</h2>
                 <div id="routeInfo">
-                    <p>Generate a random problem or place markers manually.</p>
+                    <div class="metric-card">
+                        <h4>Algorithm Status</h4>
+                        <div class="value">Ready</div>
+                    </div>
+                    <p>Generate a random problem or place markers manually to begin optimization.</p>
+                    <div class="code-block">
+                        // Initialize optimization parameters
+                        const params = {
+                          algorithm: "VRP",
+                          constraints: true,
+                          optimizeFor: "distance"
+                        };
+                    </div>
                 </div>
+                
                 <div class="legend">
-                    <h3>Legend</h3>
+                    <h3>
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        Legend
+                    </h3>
                     <ul>
                         <li><span class="marker driver"></span> Driver</li>
-                        <li><span class="marker pickup"></span> Pickup Location</li>
-                        <li><span class="marker dropoff"></span> Dropoff Location</li>
-                        <li><span class="route-line"></span> Optimal Route</li>
+                        <li><span class="marker pickup"></span> Pickup</li>
+                        <li><span class="marker dropoff"></span> Dropoff</li>
+                        <li><span class="route-line"></span> Route</li>
                     </ul>
                 </div>
+                
                 <div class="algorithm-info">
-                    <h3>Algorithm Information</h3>
-                    <p><strong>OR-Tools (VRP):</strong> Google's optimization engine that finds the most optimal route respecting all constraints.</p>
-                    <p><strong>Dijkstra:</strong> Finds shortest paths between nodes in a graph, visiting all locations.</p>
-                    <p><strong>TSP:</strong> Solves the Traveling Salesman Problem with pickup/delivery constraints.</p>
+                    <h3>
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Algorithms
+                    </h3>
+                    
+                    <div class="algorithm-card" id="ortools-card">
+                        <h4>OR-Tools (VRP) <span class="algorithm-tag">Backend</span></h4>
+                        <p>Google's optimization engine that finds the most optimal route respecting all pickup/delivery constraints.</p>
+                    </div>
+                    
+                    <div class="algorithm-card" id="dijkstra-card">
+                        <h4>Dijkstra's Algorithm <span class="algorithm-tag">Frontend</span></h4>
+                        <p>Classic graph-based algorithm that finds shortest paths between nodes, optimizing each segment individually.</p>
+                    </div>
+                    
+                    <div class="algorithm-card" id="tsp-card">
+                        <h4>TSP Optimization <span class="algorithm-tag">Frontend</span></h4>
+                        <p>Traveling Salesman Problem variant that creates an efficient tour visiting all locations while respecting constraints.</p>
+                    </div>
                 </div>
             </div>
-        </main>
+        </div>
         
-        <footer>
-            <p>Vehicle Routing Problem Visualization | Made with OR-Tools</p>
-        </footer>
+        <!-- Calculation animation container -->
+        <div class="calculation-animation" id="calculation-animation"></div>
+        
+        <!-- Floating scroll down button -->
+        <div class="scroll-down-btn" id="scroll-down-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+        </div>
+
+        <!-- Floating scroll up button -->
+        <div class="scroll-up-btn" id="scroll-up-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" transform="rotate(180, 10, 10)" />
+            </svg>
+        </div>
+    </div>
+    
+    <!-- Second section for algorithm details -->
+    <div class="second-section" id="second-section">
+        <div class="section-inner">
+            <div class="section-header">
+                <h2>Optimization Algorithms Explained</h2>
+                <p>Explore the different routing algorithms and how they solve complex vehicle routing problems.</p>
+            </div>
+            
+            <div class="cards-container">
+                <div class="info-card">
+                    <h3>Vehicle Routing Problem</h3>
+                    <p>The Vehicle Routing Problem (VRP) is a combinatorial optimization problem seeking to find the optimal set of routes for a fleet of vehicles to traverse in order to deliver to a given set of customers.</p>
+                    <p>This implementation focuses on pickup and delivery constraints, where each passenger must be picked up before being dropped off.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Dijkstra's Algorithm</h3>
+                    <p>Dijkstra's algorithm is a classic graph algorithm that finds the shortest paths between nodes in a graph. For each node, the algorithm finds the path with lowest cost to every other node.</p>
+                    <p>In our implementation, we use it to find the most efficient paths between consecutive stops in the route.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Traveling Salesman Problem</h3>
+                    <p>The TSP asks the question: "Given a list of cities and the distances between each pair of cities, what is the shortest possible route that visits each city exactly once and returns to the origin city?"</p>
+                    <p>Our implementation adds pickup-delivery constraints to this classic problem.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="js/algorithms.js"></script>
     <script src="js/map.js"></script>
     <script src="js/main.js"></script>
+    
+    <!-- Add sidebar toggle and scroll functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Sidebar toggle functionality
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+            
+            // Scroll down button functionality
+            const scrollDownBtn = document.getElementById('scroll-down-btn');
+            const secondSection = document.getElementById('second-section');
+            
+            scrollDownBtn.addEventListener('click', () => {
+                secondSection.scrollIntoView({ behavior: 'smooth' });
+            });
+            
+            // Scroll up button functionality
+            const scrollUpBtn = document.getElementById('scroll-up-btn');
+            
+            scrollUpBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Map tools functionality - connect to Leaflet map
+            const zoomInTool = document.querySelector('.map-tools .map-tool:nth-child(1)');
+            const zoomOutTool = document.querySelector('.map-tools .map-tool:nth-child(2)');
+            const centerMapTool = document.querySelector('.map-tools .map-tool:nth-child(3)');
+            
+            zoomInTool.addEventListener('click', () => {
+                routeMap.map.zoomIn();
+            });
+            
+            zoomOutTool.addEventListener('click', () => {
+                routeMap.map.zoomOut();
+            });
+            
+            centerMapTool.addEventListener('click', () => {
+                if (routeMap.problem) {
+                    const group = new L.featureGroup(routeMap.markers);
+                    routeMap.map.fitBounds(group.getBounds().pad(0.1));
+                } else {
+                    const delhiCoords = [28.7041, 77.1025];
+                    routeMap.map.setView(delhiCoords, 11);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

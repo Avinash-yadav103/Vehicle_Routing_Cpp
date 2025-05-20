@@ -154,4 +154,32 @@ document.addEventListener('DOMContentLoaded', () => {
     function showError(message) {
         routeInfo.innerHTML = `<div class="error">${message}</div>`;
     }
+    
+    // Scroll up button functionality
+    const scrollUpBtn = document.getElementById('scroll-up-btn');
+    const scrollDownBtn = document.getElementById('scroll-down-btn');
+    const mapSection = document.querySelector('.container');
+    
+    // Show/hide scroll buttons based on scroll position
+    window.addEventListener('scroll', () => {
+        const scrollPosition = window.scrollY;
+        const windowHeight = window.innerHeight;
+        
+        // If we've scrolled down to see the second section
+        if (scrollPosition > windowHeight * 0.5) {
+            scrollUpBtn.classList.add('visible');
+            scrollDownBtn.classList.remove('visible');
+        } else {
+            scrollUpBtn.classList.remove('visible');
+            scrollDownBtn.classList.add('visible');
+        }
+    });
+    
+    // Trigger the scroll event on page load
+    window.dispatchEvent(new Event('scroll'));
+    
+    // Scroll up button click handler
+    scrollUpBtn.addEventListener('click', () => {
+        mapSection.scrollIntoView({ behavior: 'smooth' });
+    });
 });
