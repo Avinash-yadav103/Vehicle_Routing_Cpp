@@ -194,9 +194,10 @@ def generate_problem_from_real_data():
             "dropoff_address": user['dropoff_address']
         })
     
-    # Log for debugging
+    # Debug output
     print(f"Generated problem with {len(passengers)} passengers")
-    print(f"First passenger data: {passengers[0] if passengers else 'None'}")
+    if passengers:
+        print(f"First passenger: {passengers[0]['name']} - Pickup: {passengers[0]['pickup']}, Dropoff: {passengers[0]['dropoff']}")
     
     result = {
         "driver": driver,

@@ -28,29 +28,43 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // Call the backend API to get a randomly generated problem
             const response = await fetch('/api/random-problem');
-            if (!response.ok) {
-                throw new Error('Failed to generate problem');
+            const responseText = await response.text(); // Get the raw text first
+            
+            console.log('Raw response:', responseText);
+            
+            try {
+                // Try to parse it as JSON
+                const data = JSON.parse(responseText);
+                console.log('Parsed data:', data);
+                
+                if (!data.driver) {
+                    console.error('Missing driver data');
+                    alert('Error: Missing driver data');
+                    return;
+                }
+                
+                if (!data.passengers || !Array.isArray(data.passengers) || data.passengers.length === 0) {
+                    console.error('Missing or invalid passengers data');
+                    alert('Error: Missing or invalid passengers data');
+                    return;
+                }
+                
+                // If we got this far, the data seems valid
+                routeMap.setProblem(data);
+                
+                // Update the UI
+                document.getElementById('solveBtn').disabled = false;
+                document.getElementById('animateBtn').disabled = true;
+                
+                // Update the route information display
+                updateProblemInfo(data);
+            } catch (parseError) {
+                console.error('Error parsing JSON:', parseError);
+                alert('Error parsing response: ' + parseError.message);
             }
-            
-            const data = await response.json();
-            
-            // Verify that we have both driver and passenger data
-            if (!data.driver || !data.passengers || data.passengers.length === 0) {
-                throw new Error('Invalid problem data - missing driver or passengers');
-            }
-            
-            // Set the problem data in the map
-            routeMap.setProblem(data);
-            
-            // Update the UI
-            document.getElementById('solveBtn').disabled = false;
-            document.getElementById('animateBtn').disabled = true;
-            
-            // Update the route information display
-            updateProblemInfo(data);
         } catch (error) {
-            console.error('Error generating problem:', error);
-            alert('Failed to generate problem: ' + error.message);
+            console.error('Network error:', error);
+            alert('Network error: ' + error.message);
         } finally {
             hideCalculating();
         }

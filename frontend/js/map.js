@@ -90,45 +90,66 @@ class RouteMap {
         console.log("Setting problem on map:", problem);
         
         // Add driver marker
-        const driverMarker = L.marker([problem.driver[1], problem.driver[0]], {
-            icon: this.icons.driver,
-            title: 'Driver Starting Location'
-        }).addTo(this.map);
+        try {
+            console.log("Driver coordinates:", problem.driver);
+            const driverMarker = L.marker([problem.driver[1], problem.driver[0]], {
+                icon: this.icons.driver,
+                title: 'Driver Starting Location'
+            }).addTo(this.map);
+            
+            driverMarker.bindTooltip("Driver Start");
+            this.markers.push(driverMarker);
+        } catch (error) {
+            console.error("Error adding driver marker:", error);
+            console.log("Driver data:", problem.driver);
+        }
         
-        driverMarker.bindTooltip("Driver Start");
-        this.markers.push(driverMarker);
-        
-        // Add passenger markers
+        // Add passenger markers with better error handling
         problem.passengers.forEach((passenger, index) => {
-            const passengerName = passenger.name || `Passenger ${index+1}`;
-            
-            // Add pickup marker
-            console.log(`Adding pickup marker for ${passengerName} at [${passenger.pickup[1]}, ${passenger.pickup[0]}]`);
-            const pickupMarker = L.marker([passenger.pickup[1], passenger.pickup[0]], {
-                icon: this.icons.pickup,
-                title: `${passengerName} Pickup`
-            }).addTo(this.map);
-            
-            pickupMarker.bindTooltip(`
-                <strong>${passengerName}</strong><br>
-                <em>Pickup Location</em>
-                ${passenger.pickup_address ? `<br>${passenger.pickup_address}` : ''}
-            `);
-            
-            // Add dropoff marker
-            console.log(`Adding dropoff marker for ${passengerName} at [${passenger.dropoff[1]}, ${passenger.dropoff[0]}]`);
-            const dropoffMarker = L.marker([passenger.dropoff[1], passenger.dropoff[0]], {
-                icon: this.icons.dropoff,
-                title: `${passengerName} Dropoff`
-            }).addTo(this.map);
-            
-            dropoffMarker.bindTooltip(`
-                <strong>${passengerName}</strong><br>
-                <em>Dropoff Location</em>
-                ${passenger.dropoff_address ? `<br>${passenger.dropoff_address}` : ''}
-            `);
-            
-            this.markers.push(pickupMarker, dropoffMarker);
+            try {
+                const passengerName = passenger.name || `Passenger ${index+1}`;
+                
+                // Validate coordinates
+                if (!passenger.pickup || !Array.isArray(passenger.pickup) || passenger.pickup.length !== 2) {
+                    console.error(`Invalid pickup coordinates for ${passengerName}:`, passenger.pickup);
+                    return; // Skip this passenger
+                }
+                
+                if (!passenger.dropoff || !Array.isArray(passenger.dropoff) || passenger.dropoff.length !== 2) {
+                    console.error(`Invalid dropoff coordinates for ${passengerName}:`, passenger.dropoff);
+                    return; // Skip this passenger
+                }
+                
+                // Add pickup marker
+                console.log(`Adding pickup marker for ${passengerName} at [${passenger.pickup[1]}, ${passenger.pickup[0]}]`);
+                const pickupMarker = L.marker([passenger.pickup[1], passenger.pickup[0]], {
+                    icon: this.icons.pickup,
+                    title: `${passengerName} Pickup`
+                }).addTo(this.map);
+                
+                pickupMarker.bindTooltip(`
+                    <strong>${passengerName}</strong><br>
+                    <em>Pickup Location</em>
+                    ${passenger.pickup_address ? `<br>${passenger.pickup_address}` : ''}
+                `);
+                
+                // Add dropoff marker
+                console.log(`Adding dropoff marker for ${passengerName} at [${passenger.dropoff[1]}, ${passenger.dropoff[0]}]`);
+                const dropoffMarker = L.marker([passenger.dropoff[1], passenger.dropoff[0]], {
+                    icon: this.icons.dropoff,
+                    title: `${passengerName} Dropoff`
+                }).addTo(this.map);
+                
+                dropoffMarker.bindTooltip(`
+                    <strong>${passengerName}</strong><br>
+                    <em>Dropoff Location</em>
+                    ${passenger.dropoff_address ? `<br>${passenger.dropoff_address}` : ''}
+                `);
+                
+                this.markers.push(pickupMarker, dropoffMarker);
+            } catch (error) {
+                console.error(`Error processing passenger ${index}:`, error);
+            }
         });
         
         // Fit map to show all markers
