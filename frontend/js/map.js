@@ -87,31 +87,55 @@ class RouteMap {
         this.clearMap();
         this.problem = problem;
         
+        console.log("Setting problem on map:", problem);
+        
         // Add driver marker
-        const driverMarker = L.marker([problem.driver[1], problem.driver[0]], { 
+        const driverMarker = L.marker([problem.driver[1], problem.driver[0]], {
             icon: this.icons.driver,
             title: 'Driver Starting Location'
         }).addTo(this.map);
+        
+        driverMarker.bindTooltip("Driver Start");
         this.markers.push(driverMarker);
         
         // Add passenger markers
         problem.passengers.forEach((passenger, index) => {
+            const passengerName = passenger.name || `Passenger ${index+1}`;
+            
+            // Add pickup marker
+            console.log(`Adding pickup marker for ${passengerName} at [${passenger.pickup[1]}, ${passenger.pickup[0]}]`);
             const pickupMarker = L.marker([passenger.pickup[1], passenger.pickup[0]], {
                 icon: this.icons.pickup,
-                title: `Passenger ${index+1} Pickup`
+                title: `${passengerName} Pickup`
             }).addTo(this.map);
             
+            pickupMarker.bindTooltip(`
+                <strong>${passengerName}</strong><br>
+                <em>Pickup Location</em>
+                ${passenger.pickup_address ? `<br>${passenger.pickup_address}` : ''}
+            `);
+            
+            // Add dropoff marker
+            console.log(`Adding dropoff marker for ${passengerName} at [${passenger.dropoff[1]}, ${passenger.dropoff[0]}]`);
             const dropoffMarker = L.marker([passenger.dropoff[1], passenger.dropoff[0]], {
                 icon: this.icons.dropoff,
-                title: `Passenger ${index+1} Dropoff`
+                title: `${passengerName} Dropoff`
             }).addTo(this.map);
+            
+            dropoffMarker.bindTooltip(`
+                <strong>${passengerName}</strong><br>
+                <em>Dropoff Location</em>
+                ${passenger.dropoff_address ? `<br>${passenger.dropoff_address}` : ''}
+            `);
             
             this.markers.push(pickupMarker, dropoffMarker);
         });
         
         // Fit map to show all markers
-        const group = new L.featureGroup(this.markers);
-        this.map.fitBounds(group.getBounds().pad(0.1));
+        if (this.markers.length > 0) {
+            const group = L.featureGroup(this.markers);
+            this.map.fitBounds(group.getBounds().pad(0.1));
+        }
     }
     
     setSolution(solution) {
@@ -181,10 +205,25 @@ class RouteMap {
             
             // Check if this is a pickup or dropoff location
             const currentPoint = this.solution.route[currentPointIndex];
+            
+            // Find the passenger name
+            let passengerName = "Unknown";
+            if (this.problem) {
+                for (const passenger of this.problem.passengers) {
+                    if ((currentPoint.type === 'pickup' && 
+                         JSON.stringify(currentPoint.location) === JSON.stringify(passenger.pickup)) ||
+                        (currentPoint.type === 'dropoff' && 
+                         JSON.stringify(currentPoint.location) === JSON.stringify(passenger.dropoff))) {
+                        passengerName = passenger.name;
+                        break;
+                    }
+                }
+            }
+            
             if (currentPoint.type === 'pickup') {
-                this._showPopup(this.animationMarker, `Picking up passenger at stop #${currentPointIndex+1}`);
+                this._showPopup(this.animationMarker, `Picking up ${passengerName} at stop #${currentPointIndex+1}`);
             } else if (currentPoint.type === 'dropoff') {
-                this._showPopup(this.animationMarker, `Dropping off passenger at stop #${currentPointIndex+1}`);
+                this._showPopup(this.animationMarker, `Dropping off ${passengerName} at stop #${currentPointIndex+1}`);
             }
             
             setTimeout(animationStep, 1000);
@@ -195,8 +234,12 @@ class RouteMap {
     }
     
     _showPopup(marker, content) {
-        marker.bindPopup(content).openPopup();
-        setTimeout(() => marker.closePopup(), 900);
+        if (marker.getPopup()) {
+            marker.setPopupContent(content);
+            marker.openPopup();
+        } else {
+            marker.bindPopup(content).openPopup();
+        }
     }
     
     solveDijkstra() {
