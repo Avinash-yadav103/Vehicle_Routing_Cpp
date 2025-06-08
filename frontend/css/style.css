@@ -622,6 +622,55 @@ h3 svg {
   100% { transform: scale(1); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
 }
 
+/* Hide some parts of the Leaflet Routing Machine UI */
+.leaflet-routing-container {
+    display: none !important;
+}
+
+/* Car animation icon */
+.car-icon {
+    z-index: 1000;
+    animation: markerPulse 1.5s infinite;
+}
+
+/* Make the route lines more visible */
+.leaflet-routing-line {
+    stroke-width: 5;
+    stroke: #4A6DFF;
+    stroke-opacity: 0.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Route display styles */
+.route-steps {
+    margin-left: 1rem;
+    padding-left: 1rem;
+    border-left: 2px solid #ddd;
+}
+
+.route-steps li {
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.route-steps li::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4A6DFF;
+    left: -1.4rem;
+    top: 0.5rem;
+}
+
+.route-steps li .address {
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+}
+
 /* Responsive adjustments */
 @media (max-width: 992px) {
   .sidebar {

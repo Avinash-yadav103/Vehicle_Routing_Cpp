@@ -197,13 +197,123 @@ class RouteMap {
     }
     
     animateRoute() {
-        if (!this.solution) return;
+        if (!this.solution || !this.routingControl) {
+            console.warn("No solution or routing data available for animation");
+            return;
+        }
         
-        // Create an animation marker
+        // Wait for the route to be calculated
+        const waitForRoute = () => {
+            if (this.routeCoordinates) {
+                this.startAnimation();
+            } else {
+                console.log("Waiting for route calculation...");
+                setTimeout(waitForRoute, 500);
+            }
+        };
+        
+        waitForRoute();
+    }
+    
+    displaySolution(solution, algorithm) {
+        // Store the solution
+        this.solution = solution;
+        
+        // Clear any existing route display
+        if (this.routeLine) {
+            this.map.removeLayer(this.routeLine);
+            this.routeLine = null;
+        }
+        
+        if (this.routingControl) {
+            this.map.removeControl(this.routingControl);
+            this.routingControl = null;
+        }
+        
+        // Extract all points from the solution
+        const routePoints = solution.route.map(point => point.location);
+        
+        // Create array of waypoints for routing (convert from [lng, lat] to L.latLng(lat, lng))
+        const waypoints = solution.route.map(point => L.latLng(point.location[1], point.location[0]));
+        
+        if (waypoints.length < 2) {
+            console.warn("Not enough points to create a route");
+            return;
+        }
+        
+        // Configure the routing control with OSRM service
+        this.routingControl = L.Routing.control({
+            waypoints: waypoints,
+            router: L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
+                profile: 'driving',
+                useHints: false
+            }),
+            lineOptions: {
+                styles: [
+                    {color: '#4A6DFF', opacity: 0.8, weight: 5}
+                ]
+            },
+            routeWhileDragging: false,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            showAlternatives: false,
+            // Don't create the default markers as we already have our own
+            createMarker: function() { return null; }
+        }).addTo(this.map);
+        
+        // Hide the control panel but keep the routes
+        this.routingControl.hide();
+        
+        // Store the waypoints for animation
+        this.waypoints = waypoints;
+        
+        // Add a callback when routes are calculated
+        this.routingControl.on('routesfound', (e) => {
+            const routes = e.routes;
+            const route = routes[0]; // Get the first (preferred) route
+            
+            // Update UI with route statistics
+            const distance = route.summary.totalDistance / 1000; // km
+            const duration = route.summary.totalTime / 60; // minutes
+            
+            const routeInfoElement = document.getElementById('routeInfo');
+            if (routeInfoElement) {
+                // Add statistics to route info
+                const statsHtml = `
+                    <div class="metric-card">
+                        <h4>Route Statistics</h4>
+                        <div class="value">
+                            ${distance.toFixed(1)} km • ${Math.ceil(duration)} min
+                        </div>
+                    </div>
+                `;
+                
+                // Find the first metric card and insert after it
+                const existingMetricCard = routeInfoElement.querySelector('.metric-card');
+                if (existingMetricCard) {
+                    existingMetricCard.insertAdjacentHTML('afterend', statsHtml);
+                }
+            }
+            
+            // Store route coordinates for animation
+            this.routeCoordinates = route.coordinates;
+        });
+    }
+    
+    // Add this new method for animation
+    startAnimation() {
+        if (!this.routeCoordinates || this.routeCoordinates.length === 0) {
+            console.error("No route coordinates available for animation");
+            return;
+        }
+        
+        // Create animation marker if it doesn't exist
         if (this.animationMarker) {
             this.map.removeLayer(this.animationMarker);
         }
         
+        // Create a car icon for animation
         const carIcon = L.divIcon({
             className: 'car-icon',
             html: '<div style="font-size: 24px;">🚗</div>',
@@ -211,56 +321,88 @@ class RouteMap {
             iconAnchor: [12, 12]
         });
         
-        this.animationMarker = L.marker([this.solution.route[0].location[1], this.solution.route[0].location[0]], {
+        // Add marker at the first coordinate
+        this.animationMarker = L.marker(this.routeCoordinates[0], {
             icon: carIcon
         }).addTo(this.map);
         
-        const routePoints = this.solution.route.map(point => [point.location[1], point.location[0]]);
+        // Start the animation along the route
         let currentPointIndex = 0;
         
-        const animationStep = () => {
-            if (currentPointIndex >= routePoints.length - 1) return;
+        // Track visited waypoints to show notifications only once
+        const visitedWaypoints = new Set();
+        
+        const animateStep = () => {
+            if (currentPointIndex >= this.routeCoordinates.length - 1) {
+                console.log("Animation complete");
+                return;
+            }
             
             currentPointIndex++;
-            this.animationMarker.setLatLng(routePoints[currentPointIndex]);
+            const currentPos = this.routeCoordinates[currentPointIndex];
             
-            // Check if this is a pickup or dropoff location
-            const currentPoint = this.solution.route[currentPointIndex];
+            // Move the marker to the current position
+            this.animationMarker.setLatLng(currentPos);
             
-            // Find the passenger name
-            let passengerName = "Unknown";
-            if (this.problem) {
-                for (const passenger of this.problem.passengers) {
-                    if ((currentPoint.type === 'pickup' && 
-                         JSON.stringify(currentPoint.location) === JSON.stringify(passenger.pickup)) ||
-                        (currentPoint.type === 'dropoff' && 
-                         JSON.stringify(currentPoint.location) === JSON.stringify(passenger.dropoff))) {
-                        passengerName = passenger.name;
-                        break;
+            // Check if we're near a waypoint
+            this.waypoints.forEach((waypoint, i) => {
+                const waypointKey = `${waypoint.lat},${waypoint.lng}`;
+                
+                if (!visitedWaypoints.has(waypointKey)) {
+                    const distance = currentPos.distanceTo(waypoint);
+                    
+                    // If within 50 meters of a waypoint
+                    if (distance < 50) {
+                        visitedWaypoints.add(waypointKey);
+                        
+                        // Find corresponding solution point
+                        const point = this.solution.route[i];
+                        if (point) {
+                            // Find the passenger name
+                            let passengerName = "Unknown";
+                            let pointType = point.type;
+                            
+                            if (this.problem) {
+                                for (const passenger of this.problem.passengers) {
+                                    if ((point.type === 'pickup' && 
+                                        JSON.stringify(point.location) === JSON.stringify(passenger.pickup)) ||
+                                        (point.type === 'dropoff' && 
+                                        JSON.stringify(point.location) === JSON.stringify(passenger.dropoff))) {
+                                        passengerName = passenger.name;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            // Show tooltip based on point type
+                            if (i === 0) {
+                                this.animationMarker.bindPopup("Starting location").openPopup();
+                            } else if (pointType === 'pickup') {
+                                this.animationMarker.bindPopup(`Picking up ${passengerName} at stop #${i+1}`).openPopup();
+                                
+                                // Pause a bit longer at pickup/dropoff
+                                setTimeout(() => {
+                                    this.animationMarker.closePopup();
+                                }, 1500);
+                            } else if (pointType === 'dropoff') {
+                                this.animationMarker.bindPopup(`Dropping off ${passengerName} at stop #${i+1}`).openPopup();
+                                
+                                // Pause a bit longer at pickup/dropoff
+                                setTimeout(() => {
+                                    this.animationMarker.closePopup();
+                                }, 1500);
+                            }
+                        }
                     }
                 }
-            }
+            });
             
-            if (currentPoint.type === 'pickup') {
-                this._showPopup(this.animationMarker, `Picking up ${passengerName} at stop #${currentPointIndex+1}`);
-            } else if (currentPoint.type === 'dropoff') {
-                this._showPopup(this.animationMarker, `Dropping off ${passengerName} at stop #${currentPointIndex+1}`);
-            }
-            
-            setTimeout(animationStep, 1000);
+            // Continue animation
+            setTimeout(animateStep, 50);
         };
         
-        // Start animation
-        setTimeout(animationStep, 1000);
-    }
-    
-    _showPopup(marker, content) {
-        if (marker.getPopup()) {
-            marker.setPopupContent(content);
-            marker.openPopup();
-        } else {
-            marker.bindPopup(content).openPopup();
-        }
+        // Start the animation
+        animateStep();
     }
     
     solveDijkstra() {
